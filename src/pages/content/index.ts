@@ -1,3 +1,6 @@
+import genericEtherscanComponent from "./components/explorers/genericEtherscanComponent"
+import twitter from  "./components/twitter"
+
 switch (new URL(document.baseURI).hostname) {
   case "etherscan.io":
   case "bscscan.com":
@@ -20,11 +23,11 @@ switch (new URL(document.baseURI).hostname) {
   case "basescan.org":
   case "era.zksync.network":
   case "kromascan.com":
-    import("./components/explorers/genericEtherscanComponent");
+    genericEtherscanComponent();
     break;
   case "twitter.com":
   case "x.com":
-    import("./components/twitter");
+    twitter();
     break;
   default:
     break;

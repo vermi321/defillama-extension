@@ -1,7 +1,7 @@
 import { EtherscanAlikeExplorerConfig, injectPrice } from "../etherscanInjectPrice";
 import { injectTags } from "../etherscanInjectTags";
 
-function injectExplorerComponent() {
+export default function injectExplorerComponent() {
   let name = new URL(document.baseURI).hostname;
   let chainPrefix: string;
 
@@ -79,5 +79,3 @@ function injectExplorerComponent() {
   injectPrice(config);
   injectTags();
 }
-
-injectExplorerComponent();
