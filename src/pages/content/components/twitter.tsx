@@ -31,7 +31,15 @@ async function verifyHandle() {
   const tweets = document.querySelectorAll('[data-testid="tweet"]');
 
   tweets.forEach((tweet, index) => {
-    const { tweetHandle, displayName, tweetText, isRepliedTo } = getTweetInfo(tweet);
+    handleTweet(tweet, index)
+    const quotedTweet = getQT(tweet);
+    if (quotedTweet) handleTweet(quotedTweet, 42, true);
+  });
+
+  function handleTweet(tweet: any, index: number, isQT = false) {
+    const { tweetHandle, displayName, tweetText, isRepliedTo } = getTweetInfo(tweet, isQT);
+
+    if (!tweetHandle) return;
     if (/^[0-9]+$/.test(tweetText)) {
       // blurRT(tweet);
       return handleSusTweet(tweet);
@@ -55,7 +63,12 @@ async function verifyHandle() {
         return;
       }
     }
-  });
+  }
+
+  function getQT(tweet: any): any {
+    const probableQTs = Array.from(tweet.querySelectorAll('[tabindex="0"]')).filter((i: any) => i.innerText?.includes('@'));
+    return probableQTs[0];
+  }
 
   function handleSusTweet(tweet: any) {
     (tweet as any).style.background = "#c0000069"; // set background as light red
@@ -64,8 +77,7 @@ async function verifyHandle() {
     if (tweet.isBlrred) return;
 
     tweet.isBlrred = true;
-    const probableQTs = Array.from(tweet.querySelectorAll('[tabindex="0"]')).filter((i: any) => i.innerText?.includes('@'));
-    const quotedTweet: any = probableQTs[0];
+    const quotedTweet = getQT(tweet);
     if (!quotedTweet) return;
 
     // write vannila code to blur the tweet and add a warning with click to reveal
@@ -118,15 +130,18 @@ async function handleHomePage(twitterConfig) {
   */
 }
 
-function getTweetInfo(tweet: any) {
+function getTweetInfo(tweet: any, isQT = false) {
   try {
-    const getNumber = (id: string) => {
-      const element = tweet.querySelector(`[data-testid="${id}"]`);
-      if (!element) return 0;
-      return +element.getAttribute("aria-label").split(" ")[0];
-    };
+    if (isQT) {
+      const [displayName, tweetHandle] = tweet.querySelectorAll('[data-testid="User-Name"]')[0]?.innerText.split('\n') ?? []
+      return {
+        tweetHandle: tweetHandle?.replace("@", ""),
+        displayName,
+        isRepliedTo: false
+      }
+    }
     let element = tweet.querySelectorAll('a[role="link"]')
-    if (element[0]?.innerText.endsWith("retweeted") || element[0].innerText.endsWith("reposted")) element = Array.from(element).slice(1);
+    if (element[0]?.innerText.endsWith("retweeted") || element[0].innerText?.endsWith("reposted")) element = Array.from(element).slice(1);
     const tweetText = tweet.querySelectorAll('[data-testid="tweetText"]')[0]?.innerText
     const isRepliedTo = tweet.querySelector('[data-testid="Tweet-User-Avatar"]')?.parentElement?.children?.length > 1
     return {
