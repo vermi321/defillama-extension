@@ -14,6 +14,18 @@ cp.execSync('mv indexDist.js dist/src/pages/content/index.js')
 const manifest = JSON.parse(fs.readFileSync('./dist/manifest.json'))
 
 manifest.background.scripts = [manifest.background.service_worker]
+manifest.browser_specific_settings = {
+  gecko: {
+    id: 'addon@llama.fi',
+    strict_min_version: '42.0'
+  },
+  gecko_android: {
+    id: 'addon@llama.fi',
+    strict_min_version: '42.0'
+  },
+}
 delete manifest.background.service_worker
 
 fs.writeFileSync('./dist/manifest.json', JSON.stringify(manifest, null, 2))
+cp.execSync('rm -rf web-ext-artifacts')
+cp.execSync('npx web-ext build --source-dir dist --overwrite-dest')

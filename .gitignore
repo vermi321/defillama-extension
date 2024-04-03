@@ -27,3 +27,4 @@ packed
 .env
 
 vite.config.ts.*.mjs
+web-ext-artifacts/*
