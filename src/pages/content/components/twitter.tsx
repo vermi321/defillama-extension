@@ -5,6 +5,8 @@ initPhishingHandleDetector();
 const debouncedVerifyHandle = debounce(verifyHandle, 200);
 const debouncedVerifyHandle2 = debounce(verifyHandle, 2000); // maybe tweets take some time to load if you scroll too fast
 const debouncedVerifyHandle3 = debounce(verifyHandle, 5000); // maybe tweets take some time to load if you scroll too fast
+const debouncedVerifyHandle4 = debounce(verifyHandle, 15000); // maybe tweets take some time to load if you scroll too fast
+const debouncedVerifyHandle5 = debounce(verifyHandle, 1000); // maybe tweets take some time to load if you scroll too fast
 
 async function initPhishingHandleDetector() {
   const phishingHandleDetector = await getStorage("local", "settings:phishingHandleDetector", true);
@@ -15,6 +17,8 @@ async function initPhishingHandleDetector() {
     debouncedVerifyHandle();
     debouncedVerifyHandle2();
     debouncedVerifyHandle3();
+    debouncedVerifyHandle4();
+    debouncedVerifyHandle5();
   });
 }
 
@@ -28,6 +32,7 @@ async function verifyHandle() {
   
   tweets.forEach((tweet, index) => {
     const { tweetHandle, displayName, tweetText, isRepliedTo } = getTweetInfo(tweet);
+    console.log(tweetHandle, displayName, tweetText, isRepliedTo)
     if (/^[0-9]+$/.test(tweetText)) {
       return handleSusTweet(tweet);
     }
@@ -76,21 +81,26 @@ async function handleHomePage(twitterConfig) {
 }
 
 function getTweetInfo(tweet: any) {
-  const getNumber = (id: string) => {
-    const element = tweet.querySelector(`[data-testid="${id}"]`);
-    if (!element) return 0;
-    return +element.getAttribute("aria-label").split(" ")[0];
-  };
-  let element = tweet.querySelectorAll('a[role="link"]')
-  if (element[0].innerText.endsWith("retweeted") || element[0].innerText.endsWith("reposted")) element = Array.from(element).slice(1);
-  const tweetText = tweet.querySelectorAll('[data-testid="tweetText"]')[0].innerText
-  const isRepliedTo = tweet.querySelector('[data-testid="Tweet-User-Avatar"]')?.parentElement?.children?.length > 1
-  return {
-    tweetHandle: (element[2] as any).innerText.replace("@", ""),
-    displayName: (element[1] as any).innerText,
-    tweetText,
-    isRepliedTo
-  };
+  try {
+    const getNumber = (id: string) => {
+      const element = tweet.querySelector(`[data-testid="${id}"]`);
+      if (!element) return 0;
+      return +element.getAttribute("aria-label").split(" ")[0];
+    };
+    let element = tweet.querySelectorAll('a[role="link"]')
+    if (element[0]?.innerText.endsWith("retweeted") || element[0].innerText.endsWith("reposted")) element = Array.from(element).slice(1);
+    const tweetText = tweet.querySelectorAll('[data-testid="tweetText"]')[0]?.innerText
+    const isRepliedTo = tweet.querySelector('[data-testid="Tweet-User-Avatar"]')?.parentElement?.children?.length > 1
+    return {
+      tweetHandle: (element[2] as any)?.innerText.replace("@", ""),
+      displayName: (element[1] as any)?.innerText,
+      tweetText,
+      isRepliedTo
+    };
+  } catch (e) {
+    console.error("Error in getTweetInfo", e);
+    return { tweetHandle: "", displayName: "", tweetText: "", isRepliedTo: false };
+  }
 }
 
 const debounceTimers = {} as any;
