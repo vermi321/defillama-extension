@@ -5,6 +5,8 @@ initPhishingHandleDetector();
 const debouncedVerifyHandle = debounce(verifyHandle, 200);
 const debouncedVerifyHandle2 = debounce(verifyHandle, 2000); // maybe tweets take some time to load if you scroll too fast
 const debouncedVerifyHandle3 = debounce(verifyHandle, 5000); // maybe tweets take some time to load if you scroll too fast
+// const debouncedVerifyHandle4 = debounce(verifyHandle, 15000); // maybe tweets take some time to load if you scroll too fast
+// const debouncedVerifyHandle5 = debounce(verifyHandle, 10000); // maybe tweets take some time to load if you scroll too fast
 
 async function initPhishingHandleDetector() {
   const phishingHandleDetector = await getStorage("local", "settings:phishingHandleDetector", true);
@@ -15,6 +17,8 @@ async function initPhishingHandleDetector() {
     debouncedVerifyHandle();
     debouncedVerifyHandle2();
     debouncedVerifyHandle3();
+    // debouncedVerifyHandle4();
+    // debouncedVerifyHandle5();
   });
 }
 
@@ -25,10 +29,11 @@ async function verifyHandle() {
 
   const safeHandle = window.location.pathname.split("/")[1].toLowerCase();
   const tweets = document.querySelectorAll('[data-testid="tweet"]');
-  
+
   tweets.forEach((tweet, index) => {
     const { tweetHandle, displayName, tweetText, isRepliedTo } = getTweetInfo(tweet);
     if (/^[0-9]+$/.test(tweetText)) {
+      // blurRT(tweet);
       return handleSusTweet(tweet);
     }
     if (tweetHandle.toLowerCase() === safeHandle) {
@@ -38,9 +43,9 @@ async function verifyHandle() {
     if (handleToName[safeHandle]) {
       const distance = levenshtein.get(handleToName[safeHandle], displayName.toLowerCase());
       if (distance <= 1) {
-        if(index === 0 && isRepliedTo){
+        if (index === 0 && isRepliedTo) {
           tweets.forEach((tweet2) => {
-            if(getTweetInfo(tweet2).tweetHandle.toLowerCase() == safeHandle){
+            if (getTweetInfo(tweet2).tweetHandle.toLowerCase() == safeHandle) {
               handleSusTweet(tweet2);
             }
           })
@@ -54,6 +59,44 @@ async function verifyHandle() {
 
   function handleSusTweet(tweet: any) {
     (tweet as any).style.background = "#c0000069"; // set background as light red
+  }
+  function blurRT(tweet: any) {
+    if (tweet.isBlrred) return;
+
+    tweet.isBlrred = true;
+    const probableQTs = Array.from(tweet.querySelectorAll('[tabindex="0"]')).filter((i: any) => i.innerText?.includes('@'));
+    const quotedTweet: any = probableQTs[0];
+    if (!quotedTweet) return;
+
+    // write vannila code to blur the tweet and add a warning with click to reveal
+    // Create a new div to serve as the warning overlay
+    const warningDiv = document.createElement('div');
+    warningDiv.style.position = 'absolute';
+    warningDiv.style.top = '0';
+    warningDiv.style.left = '0';
+    warningDiv.style.width = '100%';
+    warningDiv.style.height = '100%';
+    warningDiv.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+    warningDiv.style.zIndex = '1';
+    warningDiv.style.display = 'flex';
+    warningDiv.style.justifyContent = 'center';
+    warningDiv.style.alignItems = 'center';
+    warningDiv.innerText = 'This tweet is blurred. Click to reveal.';
+
+    // Add the warning overlay to the tweet
+    quotedTweet.style.position = 'relative';
+    quotedTweet.appendChild(warningDiv);
+
+    // Blur the tweet
+    quotedTweet.style.filter = 'blur(10px)';
+
+    // Add a click event listener to the warning overlay
+    warningDiv.addEventListener('click', function () {
+      // Remove the blur and the warning overlay when the overlay is clicked
+      tweet.style.filter = '';
+      tweet.removeChild(warningDiv);
+    })
+
   }
 }
 
@@ -76,21 +119,26 @@ async function handleHomePage(twitterConfig) {
 }
 
 function getTweetInfo(tweet: any) {
-  const getNumber = (id: string) => {
-    const element = tweet.querySelector(`[data-testid="${id}"]`);
-    if (!element) return 0;
-    return +element.getAttribute("aria-label").split(" ")[0];
-  };
-  let element = tweet.querySelectorAll('a[role="link"]')
-  if (element[0].innerText.endsWith("retweeted") || element[0].innerText.endsWith("reposted")) element = Array.from(element).slice(1);
-  const tweetText = tweet.querySelectorAll('[data-testid="tweetText"]')[0].innerText
-  const isRepliedTo = tweet.querySelector('[data-testid="Tweet-User-Avatar"]')?.parentElement?.children?.length > 1
-  return {
-    tweetHandle: (element[2] as any).innerText.replace("@", ""),
-    displayName: (element[1] as any).innerText,
-    tweetText,
-    isRepliedTo
-  };
+  try {
+    const getNumber = (id: string) => {
+      const element = tweet.querySelector(`[data-testid="${id}"]`);
+      if (!element) return 0;
+      return +element.getAttribute("aria-label").split(" ")[0];
+    };
+    let element = tweet.querySelectorAll('a[role="link"]')
+    if (element[0]?.innerText.endsWith("retweeted") || element[0].innerText.endsWith("reposted")) element = Array.from(element).slice(1);
+    const tweetText = tweet.querySelectorAll('[data-testid="tweetText"]')[0]?.innerText
+    const isRepliedTo = tweet.querySelector('[data-testid="Tweet-User-Avatar"]')?.parentElement?.children?.length > 1
+    return {
+      tweetHandle: (element[2] as any)?.innerText.replace("@", ""),
+      displayName: (element[1] as any)?.innerText,
+      tweetText,
+      isRepliedTo
+    };
+  } catch (e) {
+    console.error("Error in getTweetInfo", e);
+    return { tweetHandle: "", displayName: "", tweetText: "", isRepliedTo: false };
+  }
 }
 
 const debounceTimers = {} as any;
