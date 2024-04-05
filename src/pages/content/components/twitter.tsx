@@ -1,14 +1,13 @@
 import { getStorage } from "@src/pages/libs/helpers";
 import levenshtein from "fast-levenshtein";
 
-initPhishingHandleDetector();
 const debouncedVerifyHandle = debounce(verifyHandle, 200);
 const debouncedVerifyHandle2 = debounce(verifyHandle, 2000); // maybe tweets take some time to load if you scroll too fast
 const debouncedVerifyHandle3 = debounce(verifyHandle, 5000); // maybe tweets take some time to load if you scroll too fast
 // const debouncedVerifyHandle4 = debounce(verifyHandle, 15000); // maybe tweets take some time to load if you scroll too fast
 // const debouncedVerifyHandle5 = debounce(verifyHandle, 10000); // maybe tweets take some time to load if you scroll too fast
 
-async function initPhishingHandleDetector() {
+export default async function initPhishingHandleDetector() {
   const phishingHandleDetector = await getStorage("local", "settings:phishingHandleDetector", true);
   if (!phishingHandleDetector) return;
 

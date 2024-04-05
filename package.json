@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "rm -f vite.config.ts.*.mjs && nodemon",
     "build": "tsc --noEmit && vite build",
+    "build_firefox": "node fixForFox.js",
     "zip": "web-ext build -s dist -a packed -n extension.zip -o",
     "prep": "rm -f vite.config.ts.*.mjs && rm -rf dist packed && yarn build && yarn zip"
   },
