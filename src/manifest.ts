@@ -19,12 +19,13 @@ const manifest: ManifestType = {
   content_scripts: [
     {
       matches: ["<all_urls>"],
-      js: ["src/pages/content/index.js"],
+      js: ["src/pages/content_script/index.js"],
     },
   ],
   web_accessible_resources: [
     {
       resources: [
+        "src/pages/content/index.js",
         "assets/js/*.js",
         "assets/css/*.css",
         "assets/img/memes/*.jpg",

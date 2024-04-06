@@ -3,10 +3,10 @@ import cp from 'child_process'
 
 // firefox does not support es6 modules, so we build an es5 version of content script for firefox
 
-cp.execSync('npx tsc --noEmit && npx vite build --config vite.firefox.config.ts')
-cp.execSync('cp dist/assets/index.*.js indexDist.js ')
-cp.execSync('npx tsc --noEmit && npx vite build --config vite.config.ts')
-cp.execSync('mv indexDist.js dist/src/pages/content/index.js')
+// cp.execSync('npx tsc --noEmit && npx vite build --config vite.firefox.config.ts')
+// cp.execSync('cp dist/assets/index.*.js indexDist.js ')
+// cp.execSync('npx tsc --noEmit && npx vite build --config vite.config.ts')
+// cp.execSync('mv indexDist.js dist/src/pages/content/index.js')
 
 
 // firefox does not support "service_worker" in manifest.json, so we need to replace it with "background.scripts"
