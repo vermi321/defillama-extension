@@ -4,7 +4,7 @@ import { Box, HStack, Icon, Image, Switch, Text, useColorModeValue, VStack, Link
 import { useBrowserStorage } from "../libs/hooks";
 import { FaDiscord, FaGithub, FaTwitter } from "react-icons/fa";
 import Browser from "webextension-polyfill";
-import packageJson from "../../../public/manifest.json";
+import packageJson from "../../../package.json";
 
 const Popup = () => {
   const [priceInjector, setPriceInjector] = useBrowserStorage("local", "settings:priceInjector", true);

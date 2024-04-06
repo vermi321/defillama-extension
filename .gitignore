@@ -28,3 +28,4 @@ packed
 
 vite.config.ts.*.mjs
 web-ext-artifacts/*
+public/manifest.json

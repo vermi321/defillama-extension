@@ -78,13 +78,18 @@ export async function handleTweetStatusPage() {
 
     // once safe tweet is determined, then can proceed to do analysis and ui modifications
     if (!tweetSafeInfoMemoryCache[pathname]) return;
+    let { tweetHandle: safeHandle, displayName: safeName } = tweetSafeInfoMemoryCache[pathname]
+    safeHandle = safeHandle.toLowerCase();
+    safeName = safeName.toLowerCase();
     // check if the tweet has already been analyzed
     if (tweet.getAttribute("data-dl-tweet-check")) return;
 
-    const { tweetHandle, displayName, tweetText, isRepliedTo, isLinkedTweet } = getTweetInfo(tweet);
+    let { tweetHandle, displayName, tweetText, isRepliedTo, isLinkedTweet } = getTweetInfo(tweet);
+    tweetHandle = tweetHandle.toLowerCase();
+    displayName = displayName.toLowerCase();
 
     // if the tweet handle is safe, then it's not a phishing handle (add to safe handle list)
-    if (tweetHandle.toLowerCase() === tweetSafeInfoMemoryCache[pathname].tweetHandle.toLowerCase()) {
+    if (tweetHandle === safeHandle) {
       handleOpTweet(tweet);
       return;
     } else {
@@ -100,29 +105,26 @@ export async function handleTweetStatusPage() {
       if (!!tweetText) handleTweetWithAddress(tweet, tweetText, isLinkedTweet);
     }
 
+    const handleDistance = levenshtein.get(safeHandle, tweetHandle);
+    const nameDistance = levenshtein.get(safeName, displayName);
+
     // if the tweet handle is the same as the page handle, then it's sus. Add red background the tweet
     // [can improve due to false negatives with homoglyphic attacks in the username that cant be detected by equality. maybe use levenshtein distance fuzzy matching on username as well]
-    if (displayName.toLowerCase() == tweetSafeInfoMemoryCache[pathname].displayName.toLowerCase()) {
-      const distance = levenshtein.get(
-        tweetSafeInfoMemoryCache[pathname].displayName.toLowerCase(),
-        displayName.toLowerCase(),
-      );
-      if (distance <= 1) {
-        if (index === 0 && isRepliedTo) {
-          tweets.forEach((tweet2) => {
-            if (
-              getTweetInfo(tweet2).tweetHandle.toLowerCase() ==
-              tweetSafeInfoMemoryCache[pathname].tweetHandle.toLowerCase()
-            ) {
-              handleSusTweet(tweet2, isLinkedTweet, "impersonation", "BG_RED");
-            }
-          });
-        } else {
-          handleSusTweet(tweet, isLinkedTweet, "impersonation", "BG_RED");
-        }
-
-        return;
+    if (handleDistance <= 1 || nameDistance <= 1) {
+      if (index === 0 && isRepliedTo) {
+        tweets.forEach((tweet2) => {
+          if (
+            getTweetInfo(tweet2).tweetHandle.toLowerCase() ==
+            tweetSafeInfoMemoryCache[pathname].tweetHandle.toLowerCase()
+          ) {
+            handleSusTweet(tweet2, isLinkedTweet, "impersonation", "BG_RED");
+          }
+        });
+      } else {
+        handleSusTweet(tweet, isLinkedTweet, "impersonation", "BG_RED");
       }
+
+      return;
     }
 
     // denote that the tweet has been checked, preventing duplicate analysis
