@@ -9,7 +9,25 @@ interface CheckDomainResult {
   extra?: string;
 }
 
+let domainCheckCache = new Map<string, Promise<CheckDomainResult>>();
+let lastCacheClear = Date.now();
+
+export function clearDomainCheckCache() {
+  const now = Date.now();
+  if (now - lastCacheClear > 1000 * 60 * 60) { // clear cache every hour
+    domainCheckCache = new Map();
+    lastCacheClear = now;
+  }
+}
+
 export async function checkDomain(domain: string): Promise<CheckDomainResult> {
+  clearDomainCheckCache();
+  if (!domainCheckCache.has(domain))
+    domainCheckCache.set(domain, _checkDomain(domain));
+  return domainCheckCache.get(domain);
+}
+
+async function _checkDomain(domain: string): Promise<CheckDomainResult> {
   console.log("Checking domain", domain);
   const topLevelDomain = domain.split(".").slice(-2).join(".");
   const isAllowed =
