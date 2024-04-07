@@ -19,10 +19,14 @@ initPhishingDetector();
 async function initPhishingDetector() {
   // get phishing local storage config as set in the extension popup [local storage name left as "phishingHandleDetector" for now]
   const phishingHandleDetector = await getStorage("local", "settings:phishingHandleDetector", true);
+  const twitterCashTags = await getStorage("local", "settings:twitterCashTags", true);
+  const twitterHashTags = await getStorage("local", "settings:twitterHashTags", true);
+  const twitterQT = await getStorage("local", "settings:twitterQT", true);
+  const twitterConfig = { twitterCashTags, twitterHashTags, twitterQT, };
   if (!phishingHandleDetector) return;
 
   let handlePage = getHandlerForTwitterPageVariant();
-  handlePage(); // initial run on load [might not need]
+  handlePage(twitterConfig); // initial run on load [might not need]
 
   // listen for tab ui updates or activations from the background script (more details explained there on event emitters)
   chrome.runtime.onMessage.addListener(async (request: { message: "TabUpdated" | "TabActivated" }) => {
@@ -32,7 +36,7 @@ async function initPhishingDetector() {
       await sleep(100);
       const updatedHandlePage = getHandlerForTwitterPageVariant();
       handlePage = updatedHandlePage;
-      handlePage();
+      handlePage(twitterConfig);
     }
   });
 
@@ -49,7 +53,7 @@ async function initPhishingDetector() {
             const tweet = node.querySelector<HTMLElement>('[data-testid="tweet"]');
             if (!tweet) return;
 
-            handlePage();
+            handlePage(twitterConfig);
           }
         }
       });
@@ -73,5 +77,5 @@ function getHandlerForTwitterPageVariant() {
     tweetStatusPageInitialAnalysis.isSafeTweetDetermined = false;
     return handleTweetStatusPage;
   } else if (!!document.querySelectorAll<HTMLElement>('[data-testid="UserName"]').length) return handleUserTimelinePage;
-  else return () => {};
+  else return () => { };
 }

@@ -104,6 +104,48 @@ export function handleTweetWithAddress(tweet: HTMLElement, tweetText: string, is
 }
 
 /**
+ * Adds a warning message to the tweet if it contains a cashtag
+ */
+export function handleCashTag(tweet: HTMLElement, tweetText: string, isLinkedTweet: boolean) {
+  const cashTagRegex = /\$[a-zA-Z][a-zA-Z0-9]*\b/g;
+
+  // Check if the tweet text contains an EVM address
+  const hashCashTag = tweetText.match(cashTagRegex);
+  if (!hashCashTag) return;
+
+  // display warning message on tweet
+  const warningTextContent = `Cash tag detected in this reply.`;
+  insertTweetWarningMessage(tweet, isLinkedTweet, warningTextContent);
+}
+
+/**
+ * Adds a warning message to the tweet if it contains a cashtag
+ */
+export function handleHashTag(tweet: HTMLElement, tweetText: string, isLinkedTweet: boolean) {
+  const hashTagRegex = /\#[a-zA-Z][a-zA-Z0-9]*\b/g;
+
+  // Check if the tweet text contains an EVM address
+  const hashHashTag = tweetText.match(hashTagRegex);
+  if (!hashHashTag) return;
+
+  // display warning message on tweet
+  const warningTextContent = `Hash tag detected in this reply.`;
+  insertTweetWarningMessage(tweet, isLinkedTweet, warningTextContent);
+}
+
+/**
+ * Adds a warning message to the tweet if it contains a cashtag
+ */
+export function handleQT(tweet: HTMLElement, tweetText: string, isLinkedTweet: boolean) {
+  const tweetLength = tweet.querySelectorAll('[data-testid="tweetText"]').length
+  if (tweetLength < 2) return;
+
+  // display warning message on tweet
+  const warningTextContent = `QT detected in this reply.`;
+  insertTweetWarningMessage(tweet, isLinkedTweet, warningTextContent);
+}
+
+/**
  * Create a new div to hold the warning message and reveal button
  */
 export function insertTweetWarningMessage(tweet: HTMLElement, isLinkedTweet: boolean, warningTextContent: string) {

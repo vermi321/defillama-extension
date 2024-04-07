@@ -1,4 +1,4 @@
-import { getTweetInfo, handleAdTweet, handleOpTweet, handleSusTweet, handleTweetWithAddress } from "./tweetHandlers";
+import { getTweetInfo, handleAdTweet, handleOpTweet, handleSusTweet, handleTweetWithAddress, handleCashTag, handleHashTag, handleQT, } from "./tweetHandlers";
 import levenshtein from "fast-levenshtein";
 
 //
@@ -25,12 +25,16 @@ export const tweetStatusPageInitialAnalysis = {
   isSafeTweetDetermined: false,
 };
 
-//
+type TwitterConfig = {
+  twitterCashTags: boolean;
+  twitterHashTags: boolean;
+  twitterQT: boolean;
+};
 
 /**
  * Analyze tweets (op and replies) on the linked status page
  */
-export async function handleTweetStatusPage() {
+export async function handleTweetStatusPage({ twitterCashTags, twitterHashTags, twitterQT, }: TwitterConfig) {
   const pathname = window.location.pathname;
 
   // check that the current page is a tweet page (not home/timeline page). Check done here in addition to in init page handler router to catch any edge cases
@@ -103,6 +107,9 @@ export async function handleTweetStatusPage() {
 
       // only hide addresses if not from the op
       if (!!tweetText) handleTweetWithAddress(tweet, tweetText, isLinkedTweet);
+      if (twitterCashTags && tweetText) handleCashTag(tweet, tweetText, isLinkedTweet);
+      if (twitterHashTags && tweetText) handleHashTag(tweet, tweetText, isLinkedTweet);
+      if (twitterQT && tweetText) handleQT(tweet, tweetText, isLinkedTweet);
     }
 
     const handleDistance = levenshtein.get(safeHandle, tweetHandle);
@@ -137,7 +144,7 @@ export async function handleTweetStatusPage() {
 /**
  * Analyze tweets found on the linked user timeline page
  */
-export async function handleUserTimelinePage() {
+export async function handleUserTimelinePage(_twitterConfig: TwitterConfig) {
   const isUserTimelinePage = !!document.querySelectorAll<HTMLElement>('[data-testid="UserName"]').length;
   if (!isUserTimelinePage) return;
 
@@ -151,7 +158,7 @@ export async function handleUserTimelinePage() {
 /**
  * Analyze tweets found on the home page
  */
-export async function handleHomePage(/* twitterConfig */) {
+export async function handleHomePage(_twitterConfig: TwitterConfig) {
   const isHomePage = window.location.pathname === "/home";
   if (!isHomePage) return;
 

@@ -15,6 +15,9 @@ const Popup = () => {
     "settings:phishingHandleDetector",
     true,
   );
+  const [twitterCashTags, setTwitterCashTags] = useBrowserStorage("local", "settings:twitterCashTags", false,);
+  const [twitterHashTags, setTwitterHashTags] = useBrowserStorage("local", "settings:twitterHashTags", false,);
+  const [twitterQT, setTwitterQT] = useBrowserStorage("local", "settings:twitterQT", false,);
 
   return (
     <Box w="xs" py="4" px="4" userSelect="none">
@@ -67,6 +70,45 @@ const Popup = () => {
             isChecked={phishingHandleDetector}
             onChange={(e) => {
               setPhishingHandleDetector(e.target.checked);
+              if (!e.target.checked) {
+                Browser.action.setIcon({ path: cuteStatic });
+              }
+            }}
+          />
+        </HStack>
+        <HStack justify="space-between" w="full">
+          <Text fontSize="sm">Twitter: hide cash tags</Text>
+          <Switch
+            size="sm"
+            isChecked={twitterCashTags}
+            onChange={(e) => {
+              setTwitterCashTags(e.target.checked);
+              if (!e.target.checked) {
+                Browser.action.setIcon({ path: cuteStatic });
+              }
+            }}
+          />
+        </HStack>
+        <HStack justify="space-between" w="full">
+          <Text fontSize="sm">Twitter: hide hash tags</Text>
+          <Switch
+            size="sm"
+            isChecked={twitterHashTags}
+            onChange={(e) => {
+              setTwitterHashTags(e.target.checked);
+              if (!e.target.checked) {
+                Browser.action.setIcon({ path: cuteStatic });
+              }
+            }}
+          />
+        </HStack>
+        <HStack justify="space-between" w="full">
+          <Text fontSize="sm">Twitter: hide QT</Text>
+          <Switch
+            size="sm"
+            isChecked={twitterQT}
+            onChange={(e) => {
+              setTwitterQT(e.target.checked);
               if (!e.target.checked) {
                 Browser.action.setIcon({ path: cuteStatic });
               }
