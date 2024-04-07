@@ -16,12 +16,12 @@ const manifest = JSON.parse(fs.readFileSync('./dist/manifest.json'))
 manifest.background.scripts = [manifest.background.service_worker]
 manifest.browser_specific_settings = {
   gecko: {
-    id: 'addon-defillama@llama.fi',
-    strict_min_version: '42.0'
+    id: 'addon1@llama.fi',
+    strict_min_version: '111.0'
   },
   gecko_android: {
-    id: 'addon-defillama@llama.fi',
-    strict_min_version: '42.0'
+    id: 'addon1@llama.fi',
+    strict_min_version: '111.0'
   },
 }
 delete manifest.background.service_worker
