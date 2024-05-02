@@ -202,7 +202,7 @@ function setupUpdateProtocolsDb() {
     if (!a) {
       console.log("setupUpdateProtocolsDb", "create");
       updateProtocolsDb();
-      Browser.alarms.create("updateProtocolsDb", { periodInMinutes: 60 }); // update once every 2 hours
+      Browser.alarms.create("updateProtocolsDb", { periodInMinutes: 4 * 60 }); // update once every 4 hours
     }
   });
 }
@@ -213,7 +213,7 @@ function setupUpdateDomainDbs() {
     if (!a) {
       console.log("setupUpdateDomainDbs", "create");
       updateDomainDbs();
-      Browser.alarms.create("updateDomainDbs", { periodInMinutes: 60 }); // update once every 2 hours
+      Browser.alarms.create("updateDomainDbs", { periodInMinutes: 4 * 60  }); // update once every 4 hours
     }
   });
 }
