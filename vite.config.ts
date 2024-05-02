@@ -30,7 +30,7 @@ export default defineConfig({
         content: resolve(pagesDir, "content", "index.ts"),
         background: resolve(pagesDir, "background", "index.ts"),
         popup: resolve(pagesDir, "popup", "index.html"),
-        content_script: resolve(root, "content_script.js"), // Add this line
+        content_script: resolve(root, "content_script.js"),
       },
       output: {
         entryFileNames: "src/pages/[name]/index.js",

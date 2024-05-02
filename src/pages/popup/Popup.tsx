@@ -1,6 +1,6 @@
 import cute from "@assets/img/memes/cute.gif";
 import cuteStatic from "@assets/img/memes/cute-128.png";
-import { Box, HStack, Icon, Image, Switch, Text, useColorModeValue, VStack, Link } from "@chakra-ui/react";
+import { Box, HStack, Icon, Image, Switch, Text, useColorModeValue, VStack, Link, Divider, } from "@chakra-ui/react";
 import { useBrowserStorage } from "../libs/hooks";
 import { FaDiscord, FaGithub, FaTwitter } from "react-icons/fa";
 import Browser from "webextension-polyfill";
@@ -31,26 +31,6 @@ const Popup = () => {
       </VStack>
       <VStack my="5" p="2" w="full" spacing="1.5" borderRadius="lg" bg={useColorModeValue("gray.100", "gray.900")}>
         <HStack justify="space-between" w="full">
-          <Text fontSize="sm">Enable address tags on explorers</Text>
-          <Switch
-            size="sm"
-            isChecked={tagsInjector}
-            onChange={(e) => {
-              setTagsInjector(e.target.checked);
-            }}
-          />
-        </HStack>
-        <HStack justify="space-between" w="full">
-          <Text fontSize="sm">Enable token prices on explorers</Text>
-          <Switch
-            size="sm"
-            isChecked={priceInjector}
-            onChange={(e) => {
-              setPriceInjector(e.target.checked);
-            }}
-          />
-        </HStack>
-        <HStack justify="space-between" w="full">
           <Text fontSize="sm">Detect phishing websites</Text>
           <Switch
             size="sm"
@@ -63,8 +43,14 @@ const Popup = () => {
             }}
           />
         </HStack>
-        <HStack justify="space-between" w="full">
-          <Text fontSize="sm">Twitter: Mitigate phishing scams</Text>
+        <HStack w="full">
+          <Text fontSize="l" fontWeight="bold">
+            Twitter:
+          </Text>
+        </HStack>
+
+        <HStack justify="space-between" w="full" pl={7}>
+          <Text fontSize="sm">Mitigate phishing scams</Text>
           <Switch
             size="sm"
             isChecked={phishingHandleDetector}
@@ -76,8 +62,8 @@ const Popup = () => {
             }}
           />
         </HStack>
-        <HStack justify="space-between" w="full">
-          <Text fontSize="sm">Twitter: hide cash tags</Text>
+        <HStack justify="space-between" w="full" pl={7}>
+          <Text fontSize="sm">Hide cash tags</Text>
           <Switch
             size="sm"
             isChecked={twitterCashTags}
@@ -89,8 +75,8 @@ const Popup = () => {
             }}
           />
         </HStack>
-        <HStack justify="space-between" w="full">
-          <Text fontSize="sm">Twitter: hide hash tags</Text>
+        <HStack justify="space-between" w="full" pl={7}>
+          <Text fontSize="sm">Hide hash tags</Text>
           <Switch
             size="sm"
             isChecked={twitterHashTags}
@@ -102,8 +88,8 @@ const Popup = () => {
             }}
           />
         </HStack>
-        <HStack justify="space-between" w="full">
-          <Text fontSize="sm">Twitter: hide QT</Text>
+        <HStack justify="space-between" w="full" pl={7}>
+          <Text fontSize="sm">Hide QT</Text>
           <Switch
             size="sm"
             isChecked={twitterQT}
@@ -112,6 +98,31 @@ const Popup = () => {
               if (!e.target.checked) {
                 Browser.action.setIcon({ path: cuteStatic });
               }
+            }}
+          />
+        </HStack>
+        <HStack w="full">
+          <Text fontSize="l" fontWeight="bold">
+            Explorer:
+          </Text>
+        </HStack>
+        <HStack justify="space-between" w="full" pl={7}>
+          <Text fontSize="sm">Enable address tags</Text>
+          <Switch
+            size="sm"
+            isChecked={tagsInjector}
+            onChange={(e) => {
+              setTagsInjector(e.target.checked);
+            }}
+          />
+        </HStack>
+        <HStack justify="space-between" w="full" pl={7}>
+          <Text fontSize="sm">Enable token prices</Text>
+          <Switch
+            size="sm"
+            isChecked={priceInjector}
+            onChange={(e) => {
+              setPriceInjector(e.target.checked);
             }}
           />
         </HStack>
