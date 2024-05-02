@@ -218,31 +218,11 @@ function setupUpdateDomainDbs() {
   });
 }
 
-/* function setupUpdateTwitterConfig() {
-  console.log("setupUpdateTwitterConfig");
-  Browser.alarms.get("updateTwitterConfig").then((a) => {
-    if (!a) {
-      console.log("setupUpdateTwitterConfig", "create");
-      updateTwitterConfig();
-      Browser.alarms.create("updateTwitterConfig", { periodInMinutes: 600 }); // update once every 2 hours
-    }
-  });
-} */
-
-/* export async function updateTwitterConfig() {
-  try {
-    const twitterConfig = await fetch(TWITTER_CONFIG_API).then((res) => res.json());
-    setStorage("local", "twitterConfig", twitterConfig);
-  } catch (error) {
-    console.log("updateTwitterConfigDb", "error", error);
-  }
-} */
 
 function startupTasks() {
   console.log("startupTasks", "start");
   setupUpdateProtocolsDb();
   setupUpdateDomainDbs();
-  // setupUpdateTwitterConfig();
   Browser.action.setIcon({ path: cute });
   console.log("startupTasks", "done");
 }
@@ -263,8 +243,5 @@ Browser.alarms.onAlarm.addListener(async (a) => {
     case "updateDomainDbs":
       await updateDomainDbs();
       break;
-    /* case "updateTwitterConfig":
-      await updateTwitterConfig();
-      break; */
   }
 });
