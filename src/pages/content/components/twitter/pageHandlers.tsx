@@ -45,6 +45,14 @@ export async function handleTweetStatusPage({ twitterCashTags, twitterHashTags, 
   const tweetConversation = document.querySelector<HTMLElement>('[aria-label="Timeline: Conversation"]');
   if (!tweetConversation) return;
   const tweets = Array.from(tweetConversation.querySelectorAll<HTMLElement>('[data-testid="tweet"]'));
+  // add QT inside the tweet body (if it exists)
+  tweets.forEach((tweet) => {
+    const probableTweets = [...tweet.querySelectorAll<HTMLElement>('[tabindex="0"]')].filter((el) => {
+      // check if it has a tweet handle
+      return el.querySelector('[data-testid="User-Name"]')
+    })
+    tweets.push(...probableTweets)
+  })
   // dont analyze batches of zero tweets. covers outcomes in which the page is still loading or when there are no other posts/replies (no need for further analysis)
   if (!tweets.length) return;
 
@@ -100,7 +108,10 @@ export async function handleTweetStatusPage({ twitterCashTags, twitterHashTags, 
       handleAdTweet(tweet);
 
       // if the tweet text content consists of only numbers, then it's sus. Add red background the tweet
-      if (/^[0-9]+$/.test(tweetText)) {
+      const onlyNumbers = /^[0-9]+$/.test(tweetText)
+      // it is not number but probably gibberish word
+      const gibberish = !onlyNumbers && tweetText.split(" ").length === 1 && /[0-9]/.test(tweetText)  && /[a-z]/.test(tweetText) && /[A-Z]/.test(tweetText) &&  /^[a-zA-Z0-9]+$/.test(tweetText)
+      if (onlyNumbers || gibberish) {
         handleSusTweet(tweet, isLinkedTweet, "onlyNumbers", "BG_RED");
         return;
       }
