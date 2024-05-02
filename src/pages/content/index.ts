@@ -1,5 +1,5 @@
 import genericEtherscanComponent from "./components/explorers/genericEtherscanComponent"
-import twitter from  "./components/twitter"
+import initPhishingDetector from  "./components/twitter/init"
 
 switch (new URL(document.baseURI).hostname) {
   case "etherscan.io":
@@ -27,7 +27,7 @@ switch (new URL(document.baseURI).hostname) {
     break;
   case "twitter.com":
   case "x.com":
-    twitter();
+    initPhishingDetector();
     break;
   default:
     break;

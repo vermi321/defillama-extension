@@ -1,14 +1,14 @@
 {
   "name": "defillama-extension",
   "private": true,
-  "version": "0.0.4.1",
+  "version": "0.0.7",
   "type": "module",
   "description": "DefiLlama Extension",
   "displayName": "DefiLlama",
   "scripts": {
     "dev": "rm -f vite.config.ts.*.mjs && nodemon",
     "build": "tsc --noEmit && vite build",
-    "build_firefox": "node fixForFox.js",
+    "build_firefox": "npm run build && node fixForFox.js",
     "zip": "web-ext build -s dist -a packed -n extension.zip -o",
     "prep": "rm -f vite.config.ts.*.mjs && rm -rf dist packed && yarn build && yarn zip"
   },

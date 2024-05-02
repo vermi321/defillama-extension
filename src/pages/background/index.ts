@@ -46,7 +46,6 @@ async function handlePhishingCheck() {
     } else {
       const domain = new URL(url).hostname.replace("www.", "");
       const res = await checkDomain(domain);
-      console.log("checkDomain", res);
       isPhishing = res.result;
       if (isPhishing) {
         switch (res.type) {
@@ -181,12 +180,19 @@ export async function updateDomainDbs() {
   console.log("updateDomainDbs", "done");
 }
 
-Browser.tabs.onUpdated.addListener(async () => {
-  console.log("onUpdated");
+// monitor updates to the tab, specifically when the user navigates to a new page (new url)
+Browser.tabs.onUpdated.addListener(async (tabId, onUpdatedInfo, tab) => {
+  // console.log("onUpdated", onUpdatedInfo.status, onUpdatedInfo.url);
+  if (onUpdatedInfo.status === "complete" && tab.active) {
+    Browser.tabs.sendMessage(tabId, { message: "TabUpdated" });
+  }
   await handlePhishingCheck();
 });
-Browser.tabs.onActivated.addListener(async () => {
-  console.log("onActivated");
+
+// monitor tab activations, when the user switches to a different tab that was already open but not active
+Browser.tabs.onActivated.addListener(async (onActivatedInfo) => {
+  // console.log("onActivated");
+  Browser.tabs.sendMessage(onActivatedInfo.tabId, { message: "TabActivated" });
   await handlePhishingCheck();
 });
 
@@ -196,7 +202,7 @@ function setupUpdateProtocolsDb() {
     if (!a) {
       console.log("setupUpdateProtocolsDb", "create");
       updateProtocolsDb();
-      Browser.alarms.create("updateProtocolsDb", { periodInMinutes: 1 }); // update once every 2 hours
+      Browser.alarms.create("updateProtocolsDb", { periodInMinutes: 4 * 60 }); // update once every 4 hours
     }
   });
 }
@@ -207,37 +213,36 @@ function setupUpdateDomainDbs() {
     if (!a) {
       console.log("setupUpdateDomainDbs", "create");
       updateDomainDbs();
-      Browser.alarms.create("updateDomainDbs", { periodInMinutes: 1 }); // update once every 2 hours
+      Browser.alarms.create("updateDomainDbs", { periodInMinutes: 4 * 60  }); // update once every 4 hours
     }
   });
 }
 
-
-function setupUpdateTwitterConfig() {
+/* function setupUpdateTwitterConfig() {
   console.log("setupUpdateTwitterConfig");
   Browser.alarms.get("updateTwitterConfig").then((a) => {
     if (!a) {
       console.log("setupUpdateTwitterConfig", "create");
       updateTwitterConfig();
-      Browser.alarms.create("updateTwitterConfig", { periodInMinutes: 1 }); // update once every 2 hours
+      Browser.alarms.create("updateTwitterConfig", { periodInMinutes: 600 }); // update once every 2 hours
     }
   });
-}
+} */
 
-export async function updateTwitterConfig() {
+/* export async function updateTwitterConfig() {
   try {
     const twitterConfig = await fetch(TWITTER_CONFIG_API).then((res) => res.json());
     setStorage("local", "twitterConfig", twitterConfig);
   } catch (error) {
     console.log("updateTwitterConfigDb", "error", error);
   }
-}
+} */
 
 function startupTasks() {
   console.log("startupTasks", "start");
   setupUpdateProtocolsDb();
   setupUpdateDomainDbs();
-  setupUpdateTwitterConfig();
+  // setupUpdateTwitterConfig();
   Browser.action.setIcon({ path: cute });
   console.log("startupTasks", "done");
 }
@@ -258,8 +263,8 @@ Browser.alarms.onAlarm.addListener(async (a) => {
     case "updateDomainDbs":
       await updateDomainDbs();
       break;
-    case "updateTwitterConfig":
+    /* case "updateTwitterConfig":
       await updateTwitterConfig();
-      break;
+      break; */
   }
 });
