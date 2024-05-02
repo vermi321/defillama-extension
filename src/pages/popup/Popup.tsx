@@ -45,7 +45,7 @@ const Popup = () => {
         </HStack>
         <HStack w="full">
           <Text fontSize="l" fontWeight="bold">
-            Twitter:
+            Twitter
           </Text>
         </HStack>
 
@@ -103,7 +103,7 @@ const Popup = () => {
         </HStack>
         <HStack w="full">
           <Text fontSize="l" fontWeight="bold">
-            Explorer:
+            Explorer
           </Text>
         </HStack>
         <HStack justify="space-between" w="full" pl={7}>
