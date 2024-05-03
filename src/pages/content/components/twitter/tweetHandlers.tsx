@@ -247,6 +247,8 @@ export function getTweetInfo(tweet: HTMLElement) {
   let userMetadata = tweet.querySelector<HTMLElement>('[data-testid="User-Name"]')
   const userMetadataText = userMetadata?.innerText.split('\n') ?? []
   const tweetText = tweet.querySelectorAll<HTMLElement>('[data-testid="tweetText"]')[0]?.innerText.trim() || '';
+  const tweetHandle = element[2]?.innerText.replace("@", "") ?? userMetadataText[1]?.replace("@", "").trim() ?? ''
+  const displayName = element[1]?.innerText ?? userMetadataText[0]?.trim() ?? ''
   // determines if tweet has replies by seeing if the tweet has the vertical bar under the user avatar
   const isRepliedTo = tweet.querySelector('[data-testid="Tweet-User-Avatar"]')?.parentElement?.children?.length > 1;
 
@@ -256,11 +258,5 @@ export function getTweetInfo(tweet: HTMLElement) {
   //  non-linked: article/div/div/children.length === 2 (content is split vertically, located on right)
   const isLinkedTweet = tweet.firstElementChild.firstElementChild.children.length === 3;
 
-  return {
-    tweetHandle: userMetadataText[1]?.replace("@", "").trim() ?? '',
-    displayName: userMetadataText[0]?.trim() ?? '',
-    tweetText,
-    isRepliedTo,
-    isLinkedTweet,
-  };
+  return { tweetHandle, displayName, tweetText, isRepliedTo, isLinkedTweet, };
 }
