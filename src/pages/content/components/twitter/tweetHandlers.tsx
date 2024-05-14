@@ -69,8 +69,8 @@ export function handleOpTweet(tweet: HTMLElement) {
   // "OP" tag. Mouse hover reveals title (created as string literal here for ease)
   const opTag = document.createElement("div");
   opTag.innerHTML = `
-    <div style="padding:2px 0px">
-      <span style="cursor:help; background-color:#0aba04; padding: 1px 5px; border-radius:10px; color:white; font-size:small;" title="Original Poster">OP</span>
+    <div style="padding:5px 0px; margin 0 5px">
+      <span style="cursor:help; background-color:#087205; padding: 1px 3px; border-radius:5px; color:white; font-size:small;" title="Original Poster">OP</span>
     </div>
   `;
   userHandleParentDiv.insertBefore(opTag.firstElementChild, userHandleParentDiv.childNodes[1]);
