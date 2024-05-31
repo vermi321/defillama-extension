@@ -90,7 +90,7 @@ function checkForSolAddress(tweetText: string) {
   const regexLower = /[a-z]/;
   const regexNumber = /[0-9]/;
 
-  const solanaAddressRegex = /([1-9A-HJ-NP-Za-km-z]{32,44})/g;
+  const solanaAddressRegex = /([1-9A-HJ-NP-Za-km-z]{39,44})/g;
   const res = tweetText.match(solanaAddressRegex);
   if (!res) return false;
   return res.some((str) => regexUpper.test(str) && regexLower.test(str) && regexNumber.test(str));
