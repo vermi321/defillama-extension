@@ -84,17 +84,28 @@ export function handleOpTweet(tweet: HTMLElement) {
   tweet.setAttribute("data-dl-tweet-check", "true");
 }
 
+
+function checkForSolAddress(tweetText: string) {
+  const regexUpper = /[A-Z]/;
+  const regexLower = /[a-z]/;
+  const regexNumber = /[0-9]/;
+
+  const solanaAddressRegex = /([1-9A-HJ-NP-Za-km-z]{32,44})/g;
+  const res = tweetText.match(solanaAddressRegex);
+  if (!res) return false;
+  return res.some((str) => regexUpper.test(str) && regexLower.test(str) && regexNumber.test(str));
+}
+
 /**
  * Adds a warning message to the tweet if it contains an ethereum/evm or solana address.
  */
 export function handleTweetWithAddress(tweet: HTMLElement, tweetText: string, isLinkedTweet: boolean) {
   // Regex for EVM and Solana addresses, respectively
   const evmAddressRegex = /(0x[a-fA-F0-9]{40})/g;
-  const solanaAddressRegex = /([1-9A-HJ-NP-Za-km-z]{32,44})/g;
 
   // Check if the tweet text contains an EVM address
   const hasEvmAddress = tweetText.match(evmAddressRegex);
-  const hasSolAddress = tweetText.match(solanaAddressRegex);
+  const hasSolAddress = checkForSolAddress(tweetText);
   if (!hasEvmAddress && !hasSolAddress) return;
 
   // display warning message on tweet
