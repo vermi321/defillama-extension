@@ -13,9 +13,8 @@ import {
   METAMASK_LIST_CONFIG_API,
   DEFILLAMA_DIRECTORY_API,
   PROTOCOL_TVL_THRESHOLD,
-  TWITTER_CONFIG_API,
 } from "../libs/constants";
-import { getStorage, setStorage } from "../libs/helpers";
+import { getStorage } from "../libs/helpers";
 import { checkDomain } from "../libs/phishing-detector";
 
 startupTasks();
@@ -29,7 +28,7 @@ async function getCurrentTab() {
 async function handlePhishingCheck() {
   const phishingDetector = await getStorage("local", "settings:phishingDetector", true);
   if (!phishingDetector) {
-    Browser.action.setIcon({ path: cute });
+    await Browser.action.setIcon({ path: cute });
     return;
   }
 
@@ -184,7 +183,7 @@ export async function updateDomainDbs() {
 Browser.tabs.onUpdated.addListener(async (tabId, onUpdatedInfo, tab) => {
   // console.log("onUpdated", onUpdatedInfo.status, onUpdatedInfo.url);
   if (onUpdatedInfo.status === "complete" && tab.active) {
-    Browser.tabs.sendMessage(tabId, { message: "TabUpdated" });
+    await Browser.tabs.sendMessage(tabId, { message: "TabUpdated" });
   }
   await handlePhishingCheck();
 });
@@ -192,32 +191,27 @@ Browser.tabs.onUpdated.addListener(async (tabId, onUpdatedInfo, tab) => {
 // monitor tab activations, when the user switches to a different tab that was already open but not active
 Browser.tabs.onActivated.addListener(async (onActivatedInfo) => {
   // console.log("onActivated");
-  Browser.tabs.sendMessage(onActivatedInfo.tabId, { message: "TabActivated" });
+  await Browser.tabs.sendMessage(onActivatedInfo.tabId, { message: "TabActivated" });
   await handlePhishingCheck();
 });
 
-function setupUpdateProtocolsDb() {
+async function setupUpdateProtocolsDb() {
   console.log("setupUpdateProtocolsDb");
-  Browser.alarms.get("updateProtocolsDb").then((a) => {
-    if (!a) {
-      console.log("setupUpdateProtocolsDb", "create");
-      updateProtocolsDb();
-      Browser.alarms.create("updateProtocolsDb", { periodInMinutes: 4 * 60 }); // update once every 4 hours
-    }
-  });
+  await Browser.alarms.clear("updateProtocolsDb");
+
+  console.log("setupUpdateProtocolsDb", "create");
+  await updateProtocolsDb();
+  Browser.alarms.create("updateProtocolsDb", { periodInMinutes: 4 * 60 }); // update once every 4 hours
 }
 
-function setupUpdateDomainDbs() {
+async function setupUpdateDomainDbs() {
   console.log("setupUpdateDomainDbs");
-  Browser.alarms.get("updateDomainDbs").then((a) => {
-    if (!a) {
-      console.log("setupUpdateDomainDbs", "create");
-      updateDomainDbs();
-      Browser.alarms.create("updateDomainDbs", { periodInMinutes: 4 * 60  }); // update once every 4 hours
-    }
-  });
-}
+  await Browser.alarms.clear("updateDomainDbs");
 
+  console.log("setupUpdateDomainDbs", "create");
+  await updateDomainDbs();
+  Browser.alarms.create("updateDomainDbs", { periodInMinutes: 4 * 60 }); // update once every 4 hours
+}
 
 function startupTasks() {
   console.log("startupTasks", "start");
