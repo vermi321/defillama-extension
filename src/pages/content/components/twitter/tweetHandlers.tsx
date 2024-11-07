@@ -177,6 +177,21 @@ export function handleQT(tweet: HTMLElement, tweetText: string, isLinkedTweet: b
 }
 
 /**
+ * Adds a warning message to spam messages
+ */
+export function handleSpamQT(tweet: HTMLElement, isLinkedTweet: boolean) {
+  let [_, quotedTweet] = tweet.querySelectorAll('[data-testid="tweetText"]')
+  if (!quotedTweet) return;  // if there is no quoted tweet
+  quotedTweet = quotedTweet.parentElement.parentElement
+  if (!quotedTweet.textContent.includes("a new version of this post")) return; // if the quoted tweet is not the updated version of the tweet
+  if (!quotedTweet.querySelectorAll('[data-testid="tweetPhoto"]').length) return; // if the quoted tweet does not have a photo
+
+  // display warning message on tweet
+  const warningTextContent = `Potential spam detected.`;
+  insertTweetWarningMessage(quotedTweet as any, isLinkedTweet, warningTextContent);
+}
+
+/**
  * Create a new div to hold the warning message and reveal button
  */
 export function insertTweetWarningMessage(tweet: HTMLElement, isLinkedTweet: boolean, warningTextContent: string) {
