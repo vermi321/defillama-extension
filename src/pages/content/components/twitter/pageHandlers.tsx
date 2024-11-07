@@ -1,4 +1,4 @@
-import { getTweetInfo, handleAdTweet, handleOpTweet, handleSusTweet, handleTweetWithAddress, handleCashTag, handleHashTag, handleQT, } from "./tweetHandlers";
+import { getTweetInfo, handleAdTweet, handleOpTweet, handleSusTweet, handleTweetWithAddress, handleCashTag, handleHashTag, handleQT, handleSpamQT, } from "./tweetHandlers";
 import levenshtein from "fast-levenshtein";
 
 //
@@ -121,10 +121,14 @@ export async function handleTweetStatusPage({ twitterCashTags, twitterHashTags, 
       if (twitterCashTags && tweetText) handleCashTag(tweet, tweetText, isLinkedTweet);
       if (twitterHashTags && tweetText) handleHashTag(tweet, tweetText, isLinkedTweet);
       if (twitterQT && tweetText) handleQT(tweet, tweetText, isLinkedTweet);
+      else handleSpamQT(tweet, isLinkedTweet);
     }
 
     const handleDistance = levenshtein.get(safeHandle, tweetHandle);
-    const nameDistance = levenshtein.get(safeName, displayName);
+    let nameDistance = levenshtein.get(safeName, displayName);
+
+    if (safeName.length === 0 && displayName.length === 0) 
+      nameDistance = 10; // if both names are empty, ignore this check
 
     // if the tweet handle is the same as the page handle, then it's sus. Add red background the tweet
     // [can improve due to false negatives with homoglyphic attacks in the username that cant be detected by equality. maybe use levenshtein distance fuzzy matching on username as well]
